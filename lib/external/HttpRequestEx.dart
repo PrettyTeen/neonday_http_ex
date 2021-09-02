@@ -326,6 +326,7 @@ class _HttpRequestEx implements HttpRequestEx {
         method,
         uri,
         headers,
+        timings: timings,
         input: input,
         onHeader: (statusCode, headers) {
           reqResult.statusCode = statusCode;
@@ -336,6 +337,7 @@ class _HttpRequestEx implements HttpRequestEx {
           onData(data);
         },
       );
+      reqResult.connectedState.value = timings.connection != null;
       reqResult.data = new Uint8List.fromList(received);
       reqResult.onComplete.value = result;
     });
