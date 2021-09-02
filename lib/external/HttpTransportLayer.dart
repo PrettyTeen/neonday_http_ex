@@ -1,4 +1,4 @@
-part of dev.neonday.libs.http_ex;
+part of neonday_http_ex;
 
 
 typedef OnReceiveHeader = Future<void> Function(int statusCode, Map<String, String> headers);

@@ -1,4 +1,4 @@
-part of dev.neonday.libs.http_ex;
+part of neonday_http_ex;
 
 abstract class IResponseEx<T> {
   /// connection successful ? true : false

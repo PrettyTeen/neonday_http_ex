@@ -1,4 +1,4 @@
-part of dev.neonday.libs.http_ex;
+part of neonday_http_ex;
 
 abstract class HttpConverter {
   static const String TAG = "HttpConverter";

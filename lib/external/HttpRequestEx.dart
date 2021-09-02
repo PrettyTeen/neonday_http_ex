@@ -1,5 +1,6 @@
-part of dev.neonday.libs.http_ex;
+part of neonday_http_ex;
 
+///TODO add Timings
 abstract class HttpRequestEx {
   // CONSTRUCTORS
   //----------------------------------------------------------------------------
@@ -20,15 +21,26 @@ abstract class HttpRequestEx {
   Object?     get lastError;
   StackTrace? get stacktrace;
 
+  bool        get requesting;
   bool        get closed;
 
-  Future<bool> run(
+  Future<bool> raw(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
+      NetworkTimes? timings,
       required HttpOnHeaderFunction onHeader,
       required HttpOnDataFunction onData,
+      bool debugIgnoreCertificate = false,
+      String debugProxy = "",
+  });
+
+  HttpRequestResult json(
+    NetworkTimeouts timeouts,
+    HttpMethod method,
+    Uri uri,
+    Map<String, String> headers, {
       bool debugIgnoreCertificate = false,
       String debugProxy = "",
   });
@@ -54,6 +66,9 @@ class _HttpRequestEx implements HttpRequestEx {
 
 
   @override
+  bool requesting = false;
+
+  @override
   bool closed = false;
 
   @override
@@ -68,17 +83,22 @@ class _HttpRequestEx implements HttpRequestEx {
   final cOnClose = new Completer<bool>();
 
   @override
-  Future<bool> run(
+  Future<bool> raw(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
+      NetworkTimes? timings,
       Stream<Uint8List>? input,
       required HttpOnHeaderFunction onHeader,
       required HttpOnDataFunction onData,
       bool debugIgnoreCertificate = false,
       String debugProxy = "",
   }) async {
+    if(requesting || closed)
+      throw(new Exception("Already have been used"));
+    requesting = true;
+    
     // PRE-INIT
     //--------------------------------------------------------------------------
     bool result = false;
@@ -236,6 +256,76 @@ class _HttpRequestEx implements HttpRequestEx {
       cOnClose.complete(false);
     return result;
   }
+
+  @override
+  HttpRequestResult json(
+    NetworkTimeouts timeouts,
+    HttpMethod method,
+    Uri uri,
+    Map<String, String> headers, {
+      bool debugIgnoreCertificate = false,
+      String debugProxy = "",
+  }) {
+    var reqResult = _rawRequest<NeonJsonObject>(
+      timeouts,
+      method,
+      uri,
+      headers,
+      onData: (data) {},
+      debugIgnoreCertificate: debugIgnoreCertificate,
+      debugProxy: debugProxy,
+    ) as _HttpRequestResultImpl;
+    
+    reqResult.onComplete.bind((result) {
+      try {
+        String data = Convert.utf8.decoder.convert(reqResult.data);
+        reqResult.result = NeonJsonObject.fromJson(data);
+      } catch(e, s) {
+        reqResult.responseIncorrectState.value = true;
+        reqResult.error = e;
+        reqResult.stackTrace = s;
+      }
+    });
+    return reqResult;
+  }
+
+
+  HttpRequestResult _rawRequest<T>(
+    NetworkTimeouts timeouts,
+    HttpMethod method,
+    Uri uri,
+    Map<String, String> headers, {
+      required HttpOnDataFunction onData,
+      bool debugIgnoreCertificate = false,
+      String debugProxy = "",
+  }) {
+    var timings = new HttpNetworkTimes();
+    var reqResult = new _HttpRequestResultImpl<T>(timings: timings);
+    
+    Future(() async {
+      List<int> received = [];
+      var result = await raw(
+        timeouts,
+        method,
+        uri,
+        headers,
+        onHeader: (statusCode, headers) {
+          reqResult.statusCode = statusCode;
+          reqResult.headers = headers;
+        },
+        onData: (data) {
+          received.addAll(data);
+          onData(data);
+        },
+        debugIgnoreCertificate: debugIgnoreCertificate,
+        debugProxy: debugProxy,
+      );
+      reqResult.data = new Uint8List.fromList(received);
+      reqResult.onComplete.value = result;
+    });
+    return reqResult;
+  }
+
 
 
   static Future<HttpClientRequest> switchMethod(
