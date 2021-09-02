@@ -18,6 +18,10 @@ abstract class HttpRequestEx {
 
   // EXTERNAL
   //----------------------------------------------------------------------------
+  bool    debugIgnoreCertificate = false;
+
+  String  debugProxy = "";
+
   Object?     get lastError;
   StackTrace? get stacktrace;
 
@@ -32,18 +36,14 @@ abstract class HttpRequestEx {
       NetworkTimes? timings,
       required HttpOnHeaderFunction onHeader,
       required HttpOnDataFunction onData,
-      bool debugIgnoreCertificate = false,
-      String debugProxy = "",
   });
 
   HttpRequestResult json(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
-    Map<String, String> headers, {
-      bool debugIgnoreCertificate = false,
-      String debugProxy = "",
-  });
+    Map<String, String> headers
+  );
 
   Future<void> close();
   //----------------------------------------------------------------------------
@@ -57,6 +57,15 @@ class _HttpRequestEx implements HttpRequestEx {
   _HttpRequestEx({
     required this.client,
   });
+
+  
+  @override
+  bool debugIgnoreCertificate = false;
+
+  @override
+  String debugProxy = "";
+
+
   
   @override
   Object? lastError;
@@ -92,8 +101,6 @@ class _HttpRequestEx implements HttpRequestEx {
       Stream<Uint8List>? input,
       required HttpOnHeaderFunction onHeader,
       required HttpOnDataFunction onData,
-      bool debugIgnoreCertificate = false,
-      String debugProxy = "",
   }) async {
     if(requesting || closed)
       throw(new Exception("Already have been used"));
@@ -262,18 +269,14 @@ class _HttpRequestEx implements HttpRequestEx {
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
-    Map<String, String> headers, {
-      bool debugIgnoreCertificate = false,
-      String debugProxy = "",
-  }) {
+    Map<String, String> headers,
+  ) {
     var reqResult = _rawRequest<NeonJsonObject>(
       timeouts,
       method,
       uri,
       headers,
       onData: (data) {},
-      debugIgnoreCertificate: debugIgnoreCertificate,
-      debugProxy: debugProxy,
     ) as _HttpRequestResultImpl;
     
     reqResult.onComplete.bind((result) {
@@ -296,8 +299,6 @@ class _HttpRequestEx implements HttpRequestEx {
     Uri uri,
     Map<String, String> headers, {
       required HttpOnDataFunction onData,
-      bool debugIgnoreCertificate = false,
-      String debugProxy = "",
   }) {
     var timings = new HttpNetworkTimes();
     var reqResult = new _HttpRequestResultImpl<T>(timings: timings);
@@ -317,8 +318,6 @@ class _HttpRequestEx implements HttpRequestEx {
           received.addAll(data);
           onData(data);
         },
-        debugIgnoreCertificate: debugIgnoreCertificate,
-        debugProxy: debugProxy,
       );
       reqResult.data = new Uint8List.fromList(received);
       reqResult.onComplete.value = result;
