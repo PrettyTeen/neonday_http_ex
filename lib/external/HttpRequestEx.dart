@@ -34,6 +34,7 @@ abstract class HttpRequestEx {
     Uri uri,
     Map<String, String> headers, {
       NetworkTimes? timings,
+      Stream<Uint8List>? input,
       required HttpOnHeaderFunction onHeader,
       required HttpOnDataFunction onData,
   });
@@ -42,8 +43,9 @@ abstract class HttpRequestEx {
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
-    Map<String, String> headers
-  );
+    Map<String, String> headers, {
+      Stream<Uint8List>? input,
+  });
 
   Future<void> close();
   //----------------------------------------------------------------------------
@@ -269,19 +271,20 @@ class _HttpRequestEx implements HttpRequestEx {
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
-    Map<String, String> headers,
-  ) {
+    Map<String, String> headers, {
+      Stream<Uint8List>? input,
+  }) {
     var reqResult = _rawRequest<T>(
       timeouts,
       method,
       uri,
       headers,
+      input: input,
       onData: (data) {},
     ) as _HttpRequestResultImpl<T>;
     
     reqResult.onComplete.bind((result) {
       try {
-        INeonJson json;
         String data = Convert.utf8.decoder.convert(reqResult.data);
         if(NeonJsonObject is T)
           reqResult.result = NeonJsonObject.fromJson(data) as T;
@@ -303,6 +306,7 @@ class _HttpRequestEx implements HttpRequestEx {
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
+      Stream<Uint8List>? input,
       required HttpOnDataFunction onData,
   }) {
     var timings = new HttpNetworkTimes();
@@ -315,6 +319,7 @@ class _HttpRequestEx implements HttpRequestEx {
         method,
         uri,
         headers,
+        input: input,
         onHeader: (statusCode, headers) {
           reqResult.statusCode = statusCode;
           reqResult.headers = headers;
