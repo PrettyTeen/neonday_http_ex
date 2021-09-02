@@ -141,9 +141,14 @@ class _HttpRequestEx implements HttpRequestEx {
         TimedTask task;
         bool timeouted = false;
 
+        Profiler profiler = new Profiler();
+
+
+
 
         // SENDING HEADERS
         //----------------------------------------------------------------------
+        profiler.start();
         task = new TimedTask(timeouts.connection, Future(() async {
           httpRequest = await switchMethod(client, uri, method);
         }));
@@ -152,7 +157,7 @@ class _HttpRequestEx implements HttpRequestEx {
           lastError = new TimeoutException("NetworkTimeouts.connection", timeouts.connection);
           stacktrace = StackTrace.current;
           break;
-        }
+        } timings?.connection = new Duration(milliseconds: profiler.time(TimeUnits.MILLISECONDS));
 
         headers.forEach((name, value) {
           httpRequest.headers.set(name, value);
@@ -162,6 +167,7 @@ class _HttpRequestEx implements HttpRequestEx {
 
         // SENDING BODY
         //----------------------------------------------------------------------
+        timings?.beginRequest = new Duration(milliseconds: profiler.time(TimeUnits.MILLISECONDS));
         if(input != null) {
           var sub = input.listen((data) {
             httpRequest.add(data);
@@ -190,7 +196,7 @@ class _HttpRequestEx implements HttpRequestEx {
           lastError = new TimeoutException("NetworkTimeouts.response", timeouts.response);
           stacktrace = StackTrace.current;
           break;
-        }
+        } timings?.beginResponse = new Duration(milliseconds: profiler.time(TimeUnits.MILLISECONDS));
         //----------------------------------------------------------------------
         
 
@@ -253,6 +259,7 @@ class _HttpRequestEx implements HttpRequestEx {
         //----------------------------------------------------------------------
 
         result = await cOnClose.future;
+        timings?.close = new Duration(milliseconds: profiler.time(TimeUnits.MILLISECONDS));
         idleTimer.cancel();
         receiveTimer.cancel();
         break;
