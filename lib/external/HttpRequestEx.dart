@@ -329,6 +329,7 @@ class _HttpRequestEx implements HttpRequestEx {
         timings: timings,
         input: input,
         onHeader: (statusCode, headers) {
+          reqResult.protoDoneState.value = true;
           reqResult.statusCode = statusCode;
           reqResult.headers = headers;
         },
