@@ -290,22 +290,31 @@ class _HttpRequestEx implements HttpRequestEx {
       onData: (data) {},
     ) as _HttpRequestResultImpl<T>;
     
+    var stacktrace = StackTrace.current;
     reqResult.onComplete.bind((result) {
+      bool unknownImplementation = false;
       try {
         String data = Convert.utf8.decoder.convert(reqResult.data);
-        if(NeonJsonObject is T)
+        if(_objectType is T)
           reqResult.result = NeonJsonObject.fromJson(data) as T;
-        else if(NeonJsonArray is T)
+        else if(_arrayType is T)
           reqResult.result = NeonJsonArray.fromJson(data) as T;
-        else throw(new Exception("Unknown implementation of INeonJson"));
+        else {
+          unknownImplementation = true;
+          throw(new Exception("Unknown implementation of INeonJson"));
+        }
       } catch(e, s) {
         reqResult.incorrectResponseState.value = true;
         reqResult.error = e;
-        reqResult.stackTrace = s;
+        reqResult.stackTrace = unknownImplementation ? stacktrace : s;
       }
     });
     return reqResult;
   }
+
+
+  static final NeonJsonObject _objectType = new NeonJsonObject();
+  static final NeonJsonArray  _arrayType = new NeonJsonArray();
 
 
   HttpRequestResult _rawRequest<T>(
