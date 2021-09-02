@@ -38,7 +38,7 @@ abstract class HttpRequestEx {
       required HttpOnDataFunction onData,
   });
 
-  HttpRequestResult json(
+  HttpRequestResult<T> json<T extends INeonJson>(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
@@ -265,24 +265,29 @@ class _HttpRequestEx implements HttpRequestEx {
   }
 
   @override
-  HttpRequestResult json(
+  HttpRequestResult<T> json<T extends INeonJson>(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
     Map<String, String> headers,
   ) {
-    var reqResult = _rawRequest<NeonJsonObject>(
+    var reqResult = _rawRequest<T>(
       timeouts,
       method,
       uri,
       headers,
       onData: (data) {},
-    ) as _HttpRequestResultImpl;
+    ) as _HttpRequestResultImpl<T>;
     
     reqResult.onComplete.bind((result) {
       try {
+        INeonJson json;
         String data = Convert.utf8.decoder.convert(reqResult.data);
-        reqResult.result = NeonJsonObject.fromJson(data);
+        if(NeonJsonObject is T)
+          reqResult.result = NeonJsonObject.fromJson(data) as T;
+        else if(NeonJsonArray is T)
+          reqResult.result = NeonJsonArray.fromJson(data) as T;
+        else throw(new Exception("Unknown implementation of INeonJson"));
       } catch(e, s) {
         reqResult.responseIncorrectState.value = true;
         reqResult.error = e;

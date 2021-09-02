@@ -123,7 +123,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: a0bc4a432e02cc0848d079e5118d50db01ab7aba
+      resolved-ref: "5e5adbadfe4cb88572a17fcdcdfb6e9ba7e8de7a"
       url: "https://PrettyTeen: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@github.com/PrettyTeen/neonday_json.git"
     source: git
     version: "0.0.1"
