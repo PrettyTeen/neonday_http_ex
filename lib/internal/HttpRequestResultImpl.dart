@@ -5,13 +5,27 @@ class _HttpRequestResultImpl<T> extends HttpRequestResult<T> {
   final NetworkTimes timings;
 
   @override
+  bool get connected          => connectedState.value!;
+
+  @override
+  bool get protoDone          => protoDoneState.value!;
+
+  @override
+  bool get incorrectResponse  => incorrectResponseState.value!;
+
+  @override
+  bool get apiDone            => apiDoneState.value!;
+
+
+
+  @override
   final Notifier<bool> connectedState = new Notifier(value: false);
 
   @override
   final Notifier<bool> protoDoneState = new Notifier(value: false);
 
   @override
-  final Notifier<bool> responseIncorrectState = new Notifier(value: false);
+  final Notifier<bool> incorrectResponseState = new Notifier(value: false);
 
   @override
   final Notifier<bool> apiDoneState   = new Notifier(value: false);

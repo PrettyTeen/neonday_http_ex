@@ -292,7 +292,7 @@ class _HttpRequestEx implements HttpRequestEx {
           reqResult.result = NeonJsonArray.fromJson(data) as T;
         else throw(new Exception("Unknown implementation of INeonJson"));
       } catch(e, s) {
-        reqResult.responseIncorrectState.value = true;
+        reqResult.incorrectResponseState.value = true;
         reqResult.error = e;
         reqResult.stackTrace = s;
       }
