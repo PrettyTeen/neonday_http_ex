@@ -45,7 +45,7 @@ abstract class HttpRequestEx {
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
-      Stream<Uint8List>? input,
+      Object? input,
   });
 
   Future<void> close();
@@ -296,7 +296,7 @@ class _HttpRequestEx implements HttpRequestEx {
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
-      Stream<Uint8List>? input,
+      Object? input,
   }) {
     var reqResult = _rawRequest<T>(
       timeouts,
@@ -339,7 +339,7 @@ class _HttpRequestEx implements HttpRequestEx {
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
-      Stream<Uint8List>? input,
+      Object? input,
       required HttpOnDataFunction onData,
   }) {
     var timings = new HttpNetworkTimes();
