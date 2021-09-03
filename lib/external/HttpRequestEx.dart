@@ -28,13 +28,14 @@ abstract class HttpRequestEx {
   bool        get requesting;
   bool        get closed;
 
+  /// [input] can be Stream<Uint8List>, Uint8List
   Future<bool> raw(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
       NetworkTimes? timings,
-      Stream<Uint8List>? input,
+      Object? input,
       required HttpOnHeaderFunction onHeader,
       required HttpOnDataFunction onData,
   });
@@ -100,7 +101,7 @@ class _HttpRequestEx implements HttpRequestEx {
     Uri uri,
     Map<String, String> headers, {
       NetworkTimes? timings,
-      Stream<Uint8List>? input,
+      Object? input,
       required HttpOnHeaderFunction onHeader,
       required HttpOnDataFunction onData,
   }) async {
@@ -129,19 +130,25 @@ class _HttpRequestEx implements HttpRequestEx {
     client.userAgent = headers["user-agent"];
 
     
-    // Log.e("getUrl $uri");
-    try {
-      while(true) {
-        late HttpClientRequest httpRequest;
-        late HttpClientResponse httpResponse;
 
-        final NotifierStorage streamListener = new NotifierStorage();
+    late HttpClientRequest httpRequest;
+    late HttpClientResponse httpResponse;
 
-        RenewableTimer idleTimer, receiveTimer;
-        TimedTask task;
-        bool timeouted = false;
+    final NotifierStorage streamListener = new NotifierStorage();
 
-        Profiler profiler = new Profiler();
+    RenewableTimer idleTimer, receiveTimer;
+    TimedTask task;
+    bool timeouted = false;
+
+    Profiler profiler = new Profiler();
+
+    StreamController<Uint8List> inputStream = new StreamController();
+    int contentLength = -1;
+    while(true) {
+      try {
+        if(input is Uint8List)
+          contentLength = input.length;
+        
 
 
 
@@ -162,6 +169,7 @@ class _HttpRequestEx implements HttpRequestEx {
         headers.forEach((name, value) {
           httpRequest.headers.set(name, value);
         });
+        httpRequest.contentLength = contentLength;
         //----------------------------------------------------------------------
 
 
@@ -169,18 +177,26 @@ class _HttpRequestEx implements HttpRequestEx {
         //----------------------------------------------------------------------
         timings?.beginRequest = new Duration(milliseconds: profiler.time(TimeUnits.MILLISECONDS));
         if(input != null) {
-          var sub = input.listen((data) {
-            httpRequest.add(data);
-          });
-          try {
-            await sub.asFuture(true);
-          } catch(e) {
-            lastError = new Exception("Input ended unsuccessfully");
+          if(input is Stream<Uint8List>) {
+            var sub = input.listen((data) {
+              httpRequest.add(data);
+            });
+            try {
+              await sub.asFuture(true);
+            } catch(e) {
+              lastError = new Exception("Input ended unsuccessfully");
+              stacktrace = StackTrace.current;
+              break;
+            } finally {
+              sub.cancel();
+            }
+          } else if(input is Uint8List) {
+            httpRequest.add(input);
+          } else {
+            lastError = new Exception("Unkown input type ${input.runtimeType}");
             stacktrace = StackTrace.current;
             break;
-          } finally {
-            sub.cancel();
-          }
+          } 
         }
         //----------------------------------------------------------------------
         
@@ -263,12 +279,13 @@ class _HttpRequestEx implements HttpRequestEx {
         idleTimer.cancel();
         receiveTimer.cancel();
         break;
-      } closed = true;
-      
-    } catch(e, s) {
-      lastError = e;
-      stacktrace = s;
-    } if(!cOnClose.isCompleted)
+      } catch(e, s) {
+        lastError = e;
+        stacktrace = s;
+      } break;
+    } inputStream.close();
+    closed = true;
+    if(!cOnClose.isCompleted)
       cOnClose.complete(false);
     return result;
   }
