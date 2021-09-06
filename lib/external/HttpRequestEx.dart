@@ -159,7 +159,7 @@ class _HttpRequestEx implements HttpRequestEx {
         task = new TimedTask(timeouts.connection, Future(() async {
           httpRequest = await switchMethod(client, uri, method);
         }));
-        timeouted = await task.run(false, true);
+        timeouted = (await task.run(false, true))!;
         if(timeouted || closed) {
           lastError = new TimeoutException("NetworkTimeouts.connection", timeouts.connection);
           stacktrace = StackTrace.current;
@@ -207,7 +207,7 @@ class _HttpRequestEx implements HttpRequestEx {
         task = new TimedTask(timeouts.response, Future(() async {
           httpResponse = await httpRequest.close();
         }));
-        timeouted = await task.run(false, true);
+        timeouted = (await task.run(false, true))!;
         if(timeouted || closed) {
           lastError = new TimeoutException("NetworkTimeouts.response", timeouts.response);
           stacktrace = StackTrace.current;
