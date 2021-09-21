@@ -5,16 +5,16 @@ class _HttpRequestResultImpl<T> extends HttpRequestResult<T> {
   final NetworkTimes timings;
 
   @override
-  bool get connected          => connectedState.value!;
+  bool get connected          => connectedState.value;
 
   @override
-  bool get protoDone          => protoDoneState.value!;
+  bool get protoDone          => protoDoneState.value;
 
   @override
-  bool get incorrectResponse  => incorrectResponseState.value!;
+  bool get incorrectResponse  => incorrectResponseState.value;
 
   @override
-  bool get apiDone            => apiDoneState.value!;
+  bool get apiDone            => apiDoneState.value;
 
 
 
@@ -50,9 +50,12 @@ class _HttpRequestResultImpl<T> extends HttpRequestResult<T> {
 
 
   @override
-  final Notifier<bool> onComplete   = new Notifier();
+  final Notifier<bool?> onComplete   = new Notifier(value: null);
 
   @override
-  Future<bool> waitForComplete()
-    => onComplete.value == null ? onComplete.asFuture() : Future.value(onComplete.value);
+  Future<bool> waitForComplete() async {
+    if(onComplete.value == null)
+      return (await onComplete.asFuture())!;
+    return Future.value(onComplete.value);
+  }
 }

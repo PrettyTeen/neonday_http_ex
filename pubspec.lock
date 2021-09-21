@@ -114,7 +114,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "04489be8dbb2bc2e5973feb5350df4c22e3facf2"
+      resolved-ref: "4d1361b3f991afcf996b3ad0f50211e9697e70f3"
       url: "https://PrettyTeen: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@github.com/PrettyTeen/neonday_core.git"
     source: git
     version: "0.0.1"
@@ -123,7 +123,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "99fee8ac1b08aef4f926e328e95d93b1c8ec19d1"
+      resolved-ref: bd907e39d3dc9ba0f17934cee74b1ebfbc574c08
       url: "https://PrettyTeen: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@github.com/PrettyTeen/neonday_json.git"
     source: git
     version: "0.0.1"

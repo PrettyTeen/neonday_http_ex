@@ -309,6 +309,8 @@ class _HttpRequestEx implements HttpRequestEx {
     
     var stacktrace = StackTrace.current;
     reqResult.onComplete.bind((result) {
+      if(!result!)
+        return;
       bool unknownImplementation = false;
       try {
         String data = Convert.utf8.decoder.convert(reqResult.data);

@@ -38,7 +38,7 @@ abstract class HttpRequestResult<T> extends IRequestResult {
 
 
 
-  INotifier<bool> get onComplete;
+  INotifier<bool?> get onComplete;
 
   Future<bool> waitForComplete();
 }
