@@ -7,8 +7,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:core/core/library.dart';
-import 'package:truecollaboration_json/main.dart';
-import 'package:truecollaboration_network_ex/main.dart';
 
 part 'external/HttpConverter.dart';
 part 'external/HttpNetworkTimes.dart';

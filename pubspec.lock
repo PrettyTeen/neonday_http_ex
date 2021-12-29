@@ -7,7 +7,7 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.6.1"
+    version: "2.8.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -21,14 +21,14 @@ packages:
       name: characters
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   charcode:
     dependency: transitive
     description:
       name: charcode
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.1"
   clock:
     dependency: transitive
     description:
@@ -43,6 +43,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
+  core:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "1daf72fc2fd43eef44e0aeedf1885efa777a5c74"
+      url: "https://github.com/TrueCollaboration/core.git"
+    source: git
+    version: "0.0.1"
   crypto:
     dependency: transitive
     description:
@@ -95,45 +104,36 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.17.0"
+  json_ex:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "068a1423cf72da4aed101e75331a45666a1f6ca9"
+      url: "https://github.com/TrueCollaboration/json_ex.git"
+    source: git
+    version: "0.0.1"
   matcher:
     dependency: transitive
     description:
       name: matcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.10"
+    version: "0.12.11"
   meta:
     dependency: transitive
     description:
       name: meta
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.3.0"
-  truecollaboration_core:
+    version: "1.7.0"
+  neonday_network_ex:
     dependency: "direct main"
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "4d1361b3f991afcf996b3ad0f50211e9697e70f3"
-      url: "https://PrettyTeen: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@github.com/PrettyTeen/truecollaboration_core.git"
-    source: git
-    version: "0.0.1"
-  truecollaboration_json:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: bd907e39d3dc9ba0f17934cee74b1ebfbc574c08
-      url: "https://PrettyTeen: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@github.com/PrettyTeen/truecollaboration_json.git"
-    source: git
-    version: "0.0.1"
-  truecollaboration_network_ex:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: e0681a72459059cade65966a7cb2247243bb2eac
-      url: "https://PrettyTeen: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@github.com/PrettyTeen/truecollaboration_network_ex.git"
+      resolved-ref: "85aaaa43b6f1f60660f6b28dd75b6e8d35070b0d"
+      url: "https://github.com/PrettyTeen/neonday_network_ex.git"
     source: git
     version: "0.0.1"
   path:
@@ -196,7 +196,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0"
+    version: "0.4.3"
   typed_data:
     dependency: transitive
     description:
@@ -217,7 +217,7 @@ packages:
       name: vector_math
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
 sdks:
-  dart: ">=2.12.0 <3.0.0"
-  flutter: ">=1.17.0"
+  dart: ">=2.15.0 <3.0.0"
+  flutter: ">=2.8.0"
