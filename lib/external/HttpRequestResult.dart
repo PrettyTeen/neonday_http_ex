@@ -1,6 +1,9 @@
-part of neonday_http_ex;
+part of truecollaboration_http_ex;
 
 abstract class HttpRequestResult<T> extends IRequestResult {
+  late HttpClientRequest rawRequest;
+  late HttpClientResponse rawResponse;
+
   @override
   bool get connected;
 
@@ -27,9 +30,9 @@ abstract class HttpRequestResult<T> extends IRequestResult {
 
   Map<String, String>? get headers;
 
-  Uint8List get data;
+  Uint8List? get rawData;
   
-  T? get result;
+  T? get response;
 
 
   Object? error;

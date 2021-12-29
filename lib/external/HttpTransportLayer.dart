@@ -1,4 +1,4 @@
-part of neonday_http_ex;
+part of truecollaboration_http_ex;
 
 
 typedef OnReceiveHeader = Future<void> Function(int statusCode, Map<String, String> headers);

@@ -11,15 +11,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  neonday_core:
+  core:
     git:
-      url: https://PrettyTeen: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@github.com/PrettyTeen/neonday_core.git
-  neonday_json:
+      url: https://github.com/TrueCollaboration/core.git
+  json_ex:
     git:
-      url: https://PrettyTeen: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@github.com/PrettyTeen/neonday_json.git
+      url: https://github.com/TrueCollaboration/json_ex.git
   neonday_network_ex:
     git:
-      url: https://PrettyTeen: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@github.com/PrettyTeen/neonday_network_ex.git
+      url: https://github.com/PrettyTeen/neonday_network_ex.git
 
 
 

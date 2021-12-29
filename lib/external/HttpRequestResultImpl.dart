@@ -1,6 +1,6 @@
-part of neonday_http_ex;
+part of truecollaboration_http_ex;
 
-class _HttpRequestResultImpl<T> extends HttpRequestResult<T> {
+class HttpRequestResultImpl<T> extends HttpRequestResult<T> {
   @override
   final NetworkTimes timings;
 
@@ -39,12 +39,12 @@ class _HttpRequestResultImpl<T> extends HttpRequestResult<T> {
   Map<String, String>? headers;
 
   @override
-  late Uint8List data;
+  Uint8List? rawData;
 
   @override
-  T? result;
+  T? response;
 
-  _HttpRequestResultImpl({
+  HttpRequestResultImpl({
     required this.timings,
   });
 

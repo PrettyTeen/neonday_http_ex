@@ -1,4 +1,4 @@
-part of neonday_http_ex;
+part of truecollaboration_http_ex;
 
 ///TODO add Timings
 abstract class HttpRequestEx {
@@ -37,6 +37,16 @@ abstract class HttpRequestEx {
       NetworkTimes? timings,
       Object? input,
       required HttpOnHeaderFunction onHeader,
+      required HttpOnDataFunction onData,
+  });
+
+  HttpRequestResult<void> parsedRaw(
+    NetworkTimeouts timeouts,
+    HttpMethod method,
+    Uri uri,
+    Map<String, String> headers, {
+      NetworkTimes? timings,
+      Object? input,
       required HttpOnDataFunction onData,
   });
 
@@ -251,7 +261,7 @@ class _HttpRequestEx implements HttpRequestEx {
         
         // RECEIVING DATA
         //----------------------------------------------------------------------
-        onHeader(httpResponse.statusCode, HttpConverter.httpHeaders2Map(httpResponse.headers));
+        onHeader(httpRequest, httpResponse, httpResponse.statusCode, HttpConverter.httpHeaders2Map(httpResponse.headers));
         
         streamListener.addStream(httpResponse.listen((bytes) {
           if(closed) {
@@ -291,21 +301,45 @@ class _HttpRequestEx implements HttpRequestEx {
   }
 
   @override
-  HttpRequestResult<T> json<T extends INeonJson>(
+  HttpRequestResult<void> parsedRaw(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
+      NetworkTimes? timings,
       Object? input,
+      required HttpOnDataFunction onData,
   }) {
-    var reqResult = _rawRequest<T>(
+    var reqResult = _rawRequest<void>(
       timeouts,
       method,
       uri,
       headers,
       input: input,
-      onData: (data) {},
-    ) as _HttpRequestResultImpl<T>;
+      onData: onData,
+    ) as HttpRequestResultImpl<void>;
+    return reqResult;
+  }
+
+  @override
+  HttpRequestResult<T> json<T extends INeonJson>(
+    NetworkTimeouts timeouts,
+    HttpMethod method,
+    Uri uri,
+    Map<String, String> headers, {
+      NetworkTimes? timings,
+      Object? input,
+  }) {
+    final List<int> received = [];
+    var reqResult = _rawRequest<T>(
+      timeouts,
+      method,
+      uri,
+      headers,
+      timings: timings,
+      input: input,
+      onData: (chunk) => received.addAll(chunk),
+    ) as HttpRequestResultImpl<T>;
     
     var stacktrace = StackTrace.current;
     reqResult.onComplete.bind((result) {
@@ -313,11 +347,11 @@ class _HttpRequestEx implements HttpRequestEx {
         return;
       bool unknownImplementation = false;
       try {
-        String data = Convert.utf8.decoder.convert(reqResult.data);
-        if(_objectType is T)
-          reqResult.result = NeonJsonObject.fromJson(data) as T;
-        else if(_arrayType is T)
-          reqResult.result = NeonJsonArray.fromJson(data) as T;
+        String data = Convert.utf8.decoder.convert(received);
+        if(T == NeonJsonObject)
+          reqResult.response = NeonJsonObject.fromJson(data) as T;
+        else if(T == NeonJsonArray)
+          reqResult.response = NeonJsonArray.fromJson(data) as T;
         else {
           unknownImplementation = true;
           throw(new Exception("Unknown implementation of INeonJson"));
@@ -332,42 +366,60 @@ class _HttpRequestEx implements HttpRequestEx {
   }
 
 
-  static final NeonJsonObject _objectType = new NeonJsonObject();
-  static final NeonJsonArray  _arrayType = new NeonJsonArray();
 
 
-  HttpRequestResult _rawRequest<T>(
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  HttpRequestResult<T> _rawRequest<T>(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
     Map<String, String> headers, {
+      NetworkTimes? timings,
       Object? input,
       required HttpOnDataFunction onData,
   }) {
-    var timings = new HttpNetworkTimes();
-    var reqResult = new _HttpRequestResultImpl<T>(timings: timings);
+    var _timings = timings ?? new HttpNetworkTimes();
+    var reqResult = new HttpRequestResultImpl<T>(timings: _timings);
     
     Future(() async {
-      List<int> received = [];
       var result = await raw(
         timeouts,
         method,
         uri,
         headers,
-        timings: timings,
+        timings: _timings,
         input: input,
-        onHeader: (statusCode, headers) {
+        onHeader: (rawRequest, rawResponse, statusCode, headers) {
+          reqResult.rawRequest = rawRequest;
+          reqResult.rawResponse = rawResponse;
+          
           reqResult.protoDoneState.value = true;
           reqResult.statusCode = statusCode;
           reqResult.headers = headers;
         },
         onData: (data) {
-          received.addAll(data);
           onData(data);
         },
       );
-      reqResult.connectedState.value = timings.connection != null;
-      reqResult.data = new Uint8List.fromList(received);
+      reqResult.connectedState.value = _timings.connection != null;
       reqResult.onComplete.value = result;
     });
     return reqResult;

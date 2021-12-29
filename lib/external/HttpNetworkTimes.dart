@@ -1,4 +1,4 @@
-part of neonday_http_ex;
+part of truecollaboration_http_ex;
 
 class HttpNetworkTimes extends NetworkTimes {
 

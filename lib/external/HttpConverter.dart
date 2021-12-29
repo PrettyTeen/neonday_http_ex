@@ -1,10 +1,19 @@
-part of neonday_http_ex;
+part of truecollaboration_http_ex;
 
 abstract class HttpConverter {
   static const String TAG = "HttpConverter";
   
   /// Returns headers in lower-case
   static Map<String, String> httpHeaders2Map(HttpHeaders headers) {
+    var map = new Map<String, String>();
+    headers.forEach((name, values) {
+      map[name.toLowerCase()] = values.join(",");
+    });
+    return map;
+  }
+
+  /// Returns headers in lower-case
+  static Map<String, String> headers2Map(Map<String, List<String>> headers) {
     var map = new Map<String, String>();
     headers.forEach((name, values) {
       map[name.toLowerCase()] = values.join(",");
