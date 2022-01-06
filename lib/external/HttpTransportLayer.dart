@@ -107,14 +107,14 @@ class HttpTransportLayer {
   }
 
 
-  static Future<IResponseEx<NeonJsonObject>> getJson(
+  static Future<IResponseEx<JsonObjectEx>> getJson(
     String url, {
       Map<String, String> headers = const {},
       bool ignoreSertificate = false,
       String? proxy,
       required HttpTimeouts timeouts,
   }) async {
-    ResponseEx<NeonJsonObject> result = new ResponseEx();
+    ResponseEx<JsonObjectEx> result = new ResponseEx();
 
     var out = await get(
       url,
@@ -126,7 +126,7 @@ class HttpTransportLayer {
     out.copyTo(result);
     
 
-    NeonJsonObject json;
+    JsonObjectEx json;
     bool jsonError = false;
     if(out.connected) {
       try {
@@ -384,13 +384,13 @@ class HttpTransportLayer {
 
 
 
-  static Future<NeonJsonObject> _response2json(HttpClientResponse response) async {
+  static Future<JsonObjectEx> _response2json(HttpClientResponse response) async {
     Stream<String> stream = Convert.utf8.decoder.bind(response);
     StringBuffer sb = new StringBuffer();
     await stream.forEach((data) {
       sb.write(data);
     });
-    return NeonJsonObject.fromJson(sb.toString());
+    return JsonObjectEx.fromJson(sb.toString());
   }
 }
 

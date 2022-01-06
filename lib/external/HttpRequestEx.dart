@@ -50,7 +50,7 @@ abstract class HttpRequestEx {
       required HttpOnDataFunction onData,
   });
 
-  HttpRequestResult<T> json<T extends INeonJson>(
+  HttpRequestResult<T> json<T extends IJsonEx>(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
@@ -322,7 +322,7 @@ class _HttpRequestEx implements HttpRequestEx {
   }
 
   @override
-  HttpRequestResult<T> json<T extends INeonJson>(
+  HttpRequestResult<T> json<T extends IJsonEx>(
     NetworkTimeouts timeouts,
     HttpMethod method,
     Uri uri,
@@ -348,13 +348,13 @@ class _HttpRequestEx implements HttpRequestEx {
       bool unknownImplementation = false;
       try {
         String data = Convert.utf8.decoder.convert(received);
-        if(T == NeonJsonObject)
-          reqResult.response = NeonJsonObject.fromJson(data) as T;
-        else if(T == NeonJsonArray)
-          reqResult.response = NeonJsonArray.fromJson(data) as T;
+        if(T == JsonObjectEx)
+          reqResult.response = JsonObjectEx.fromJson(data) as T;
+        else if(T == JsonArrayEx)
+          reqResult.response = JsonArrayEx.fromJson(data) as T;
         else {
           unknownImplementation = true;
-          throw(new Exception("Unknown implementation of INeonJson"));
+          throw(new Exception("Unknown implementation of IJsonEx"));
         }
       } catch(e, s) {
         reqResult.incorrectResponseState.value = true;
